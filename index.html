@@ -99,7 +99,7 @@
         }
 
         .control-group {
-            width:80vw;
+            width:24vw;
             background-color: #F0F0F0;
             border-radius: 15px;
             padding: 20px;
@@ -257,6 +257,7 @@
         }
 
         .firmware-upload {
+            width:21vw;
             background-color: #F0F0F0;
             border-radius: 15px;
             padding: 20px;
@@ -279,18 +280,7 @@
         }
 
         @media (max-width: 768px) {
-            .info-panel {
-            background-color: var(--secondary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            flex-wrap: wrap;
-            align-items:center;
-            justify-content: space-between;
-            color: #FFFFFF;
-        }
+            
             body {
                 padding: 10px;
                 font-size: 14px;
@@ -318,10 +308,12 @@
             }
 
             .control-panel {
-                grid-template-columns: 1fr;
+                flex-wrap: wrap;
+                flex-direction: column;
             }
 
             .control-group {
+                width:83vw;
                 padding: 15px;
             }
 
