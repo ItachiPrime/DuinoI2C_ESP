@@ -93,12 +93,13 @@
         }
 
         .control-panel {
-            display: grid;
+            display: flex;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
         .control-group {
+            width:80vw;
             background-color: #F0F0F0;
             border-radius: 15px;
             padding: 20px;
@@ -121,7 +122,7 @@
         .control-label {
             display: block;
             margin-bottom: 10px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
         }
 
@@ -259,7 +260,6 @@
             background-color: #F0F0F0;
             border-radius: 15px;
             padding: 20px;
-            margin-top: 20px;
         }
 
         .firmware-upload form {
@@ -269,11 +269,28 @@
         }
 
         .firmware-upload input[type="file"] {
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             font-size: 1rem;
         }
 
+        .fm{
+            margin-top: 0%;
+            margin-bottom: 0%;
+        }
+
         @media (max-width: 768px) {
+            .info-panel {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-items:center;
+            justify-content: space-between;
+            color: #FFFFFF;
+        }
             body {
                 padding: 10px;
                 font-size: 14px;
@@ -400,21 +417,22 @@
                     <button id="restart-esp" class="btn warning">Restart ESP</button>
                 </div>
             </div>
+            <div class="firmware-upload">
+                <h2>Firmware Upload</h2>
+                <form id="firmware-form" enctype="multipart/form-data">
+                    <h3 class="fm">Firmware:</h3>
+                    <input type="file" accept=".bin,.bin.gz" name="firmware" id="firmware-file">
+                    <button type="submit" class="btn">Update Firmware</button>
+                </form>
+                <form id="filesystem-form" enctype="multipart/form-data">
+                    <h3 class="fm">FileSystem:</h3>
+                    <input type="file" accept=".bin,.bin.gz" name="filesystem" id="filesystem-file">
+                    <button type="submit" class="btn">Update FileSystem</button>
+                </form>
+            </div>
         </div>
 
-        <div class="firmware-upload">
-            <h2>Firmware Upload</h2>
-            <form id="firmware-form" enctype="multipart/form-data">
-                <h3>Firmware:</h3>
-                <input type="file" accept=".bin,.bin.gz" name="firmware" id="firmware-file">
-                <button type="submit" class="btn">Update Firmware</button>
-            </form>
-            <form id="filesystem-form" enctype="multipart/form-data">
-                <h3>FileSystem:</h3>
-                <input type="file" accept=".bin,.bin.gz" name="filesystem" id="filesystem-file">
-                <button type="submit" class="btn">Update FileSystem</button>
-            </form>
-        </div>
+        
 
         <div class="webserial-output">
             <h2>Web Serial Terminal</h2>
