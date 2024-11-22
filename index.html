@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuinoI2C_ESP Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --secondary-color: #4ECDC4;
+            --accent-color: #FFD93D;
+            --background-color: #6E44FF;
+            --text-color: #333333;
+            --terminal-bg: #2C3E50;
+            --terminal-text: #ECF0F1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-right: 20px;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin: 0;
+            text-align: center;
+        }
+
+        .info-panel {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items:center;
+            justify-content: space-between;
+            color: #FFFFFF;
+        }
+
+        .info-item {
+            align-items:left;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            flex: 1 1 10px;
+        }
+
+        .info-label {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .control-group {
+            background-color: #F0F0F0;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .control-item {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #FF8E8E;
+        }
+
+        .btn.warning {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+        }
+
+        .btn.warning:hover {
+            background-color: #FFE66D;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 10px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: right;
+            margin-left: 10px;
+            font-size: 1.1rem;
+        }
+
+        .webserial-output {
+            background-color: var(--terminal-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .webserial-output h2 {
+            color: var(--terminal-text);
+            border-bottom-color: var(--terminal-text);
+        }
+
+        #terminal {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--terminal-text);
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #input-div {
+            display: flex;
+            align-items: center;
+            color: var(--terminal-text);
+        }
+
+        #input-el {
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            color: var(--terminal-text);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            padding: 8px 12px;
+            margin-left: 5px;
+        }
+
+        #input-el:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: #808080;
+            font-size: 0.8rem;
+        }
+
+        .firmware-upload {
+            background-color: #F0F0F0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .firmware-upload form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .firmware-upload input[type="file"] {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                flex-direction: column;
+            }
+
+            .logo {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .info-panel {
+                flex-direction: column;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .control-group {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            .control-label {
+                font-size: 1rem;
+            }
+
+            .slider-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .slider-value {
+                text-align: center;
+                margin-top: 5px;
+                margin-left: 0;
+                font-size: 1rem;
+            }
+
+            #terminal {
+                font-size: 12px;
+                height: 150px;
+            }
+
+            #input-el {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .firmware-upload input[type="file"] {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco_200x200.png?raw=true" alt="Duino Coin Logo" class="logo">
+            <h1>DuinoI2C_ESP Dashboard</h1>
+        </header>
+
+        <div class="info-panel">
+            <div class="info-item">
+                <span class="info-label">IP Address:<span id="ip-address" class="info-value">192.168.60.238</span></span>
+                
+            </div>
+            <div class="info-item">
+                <span class="info-label">Firmware Version:<span id="firmware-version" class="info-value">1.0.0</span></span>
+                
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <h2>OLED Controls</h2>
+                <div class="control-item">
+                    <button id="oled-toggle" class="btn">OLED Screen:ON</button>
+                </div>
+                <div class="control-item">
+                    <label for="oled-brightness" class="control-label">OLED Brightness: <span id="oled-brightness-value">0</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="oled-brightness" class="slider" min="0" max="255" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h2>LED Controls</h2>
+                <div class="control-item">
+                    <button id="led-toggle" class="btn">Onboard LED:ON</button>
+                </div>
+                <div class="control-item">
+                    <label for="wled-brightness" class="control-label">Worker LED Brightness: <span id="wled-brightness-value">0</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="wled-brightness" class="slider" min="0" max="255" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h2>System Controls</h2>
+                <div class="control-item">
+                    <button id="restart-esp" class="btn warning">Restart ESP</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="firmware-upload">
+            <h2>Firmware Upload</h2>
+            <form id="firmware-form" enctype="multipart/form-data">
+                <h3>Firmware:</h3>
+                <input type="file" accept=".bin,.bin.gz" name="firmware" id="firmware-file">
+                <button type="submit" class="btn">Update Firmware</button>
+            </form>
+            <form id="filesystem-form" enctype="multipart/form-data">
+                <h3>FileSystem:</h3>
+                <input type="file" accept=".bin,.bin.gz" name="filesystem" id="filesystem-file">
+                <button type="submit" class="btn">Update FileSystem</button>
+            </form>
+        </div>
+
+        <div class="webserial-output">
+            <h2>Web Serial Terminal</h2>
+            <div id="terminal"></div>
+        </div>
+
+        <footer>
+            DuinoI2C_ESP Dashboard by Itachi
+        </footer>
+    </div>
+
+    <script>
+        // Helper function to create XMLHttpRequest
+        function createXmlHttpObject() {
+            if (window.XMLHttpRequest) {
+                return new XMLHttpRequest();
+            }
+            return new ActiveXObject('Microsoft.XMLHTTP');
+        }
+
+
+        // OLED Toggle
+        document.getElementById('oled-toggle').addEventListener('click', function() {
+            var xhttp = createXmlHttpObject();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var status = this.responseText === '0' ? 'OFF' : 'ON';
+                    document.getElementById('oled-toggle').textContent = 'OLED Screen: ' + status;
+                }
+            };
+            xhttp.open('PUT', 'BUTTON_0', true);
+            xhttp.send();
+        });
+
+        // LED Toggle
+        document.getElementById('led-toggle').addEventListener('click', function() {
+            var xhttp = createXmlHttpObject();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var status = this.responseText === '0' ? 'ON' : 'OFF';
+                    document.getElementById('led-toggle').textContent = 'Onboard LED: ' + status;
+                }
+            };
+            xhttp.open('PUT', 'BUTTON_2', true);
+            xhttp.send();
+        });
+
+        // OLED Brightness
+        document.getElementById('oled-brightness').addEventListener('input', function() {
+            var value = this.value;
+            document.getElementById('oled-brightness-value').textContent = value;
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(function() {
+                var xhttp = createXmlHttpObject();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById('oled-brightness-value').textContent = this.responseText;
+                    }
+                };
+                xhttp.open('PUT', 'UPDATE_SLIDER?VALUE=' + value, true);
+                xhttp.send();
+            }, 100);
+        });
+
+        // WLED Brightness
+        document.getElementById('wled-brightness').addEventListener('input', function() {
+            var value = this.value;
+            document.getElementById('wled-brightness-value').textContent = value;
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(function() {
+                var xhttp = createXmlHttpObject();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById('wled-brightness-value').textContent = this.responseText;
+                    }
+                };
+                xhttp.open('PUT', 'wLED_UPDATE_SLIDER?VALUE=' + value, true);
+                xhttp.send();
+            }, 100);
+        });
+
+        // Restart ESP
+        document.getElementById('restart-esp').addEventListener('click', function() {
+            var xhttp = createXmlHttpObject();
+            xhttp.open('PUT', 'BUTTON_1', true);
+            xhttp.send();
+        });
+
+        // WebSerial functionality
+        let port;
+        let reader;
+        const terminal = document.getElementById('terminal');
+        const inputEl = document.getElementById('input-el');
+
+        async function connectWebSerial() {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                readLoop();
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        async function readLoop() {
+            while (port.readable) {
+                reader = port.readable.getReader();
+                try {
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        terminal.textContent += new TextDecoder().decode(value);
+                        terminal.scrollTop = terminal.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    reader.releaseLock();
+                }
+            }
+        }
+
+        inputEl.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const command = inputEl.value + '\n';
+                inputEl.value = '';
+                if (port && port.writable) {
+                    const writer = port.writable.getWriter();
+                    await writer.write(new TextEncoder().encode(command));
+                    writer.releaseLock();
+                }
+            }
+        });
+
+        // Firmware upload functionality
+        document.getElementById('firmware-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            uploadFile('firmware');
+        });
+
+        document.getElementById('filesystem-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            uploadFile('filesystem');
+        });
+
+        function uploadFile(type) {
+            const fileInput = document.getElementById(type + '-file');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append(type, file);
+
+            fetch('/' + type, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert(result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during file upload.');
+            });
+        }
+
+        // Initialize
+        window.onload = function() {
+            connectWebSerial();
+        };
+    </script>
+</body>
+</html>
