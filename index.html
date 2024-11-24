@@ -19,68 +19,6 @@
         * {
             box-sizing: border-box;
         }
-        /* Web Serial Output Container */
-            .webserial-output {
-                margin: 20px;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                background-color: #f9f9f9;
-            }
-            
-            /* Flex container for the header */
-            .header-container {
-                display: flex;
-                align-items: center;
-                justify-content: space-between; /* Space between the title and toggle switch */
-                margin-bottom: 10px;
-            }
-            
-            /* Toggle Switch Style */
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 60px;
-                height: 34px;
-            }
-            
-            .switch input {
-                display: none;
-            }
-            
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #ccc;
-                transition: 0.4s;
-                border-radius: 34px;
-            }
-            
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 26px;
-                width: 26px;
-                left: 4px;
-                bottom: 4px;
-                background-color: white;
-                transition: 0.4s;
-                border-radius: 50%;
-            }
-            
-            input:checked + .slider {
-                background-color: #4caf50;
-            }
-            
-            input:checked + .slider:before {
-                transform: translateX(26px);
-            }
-
 
         body {
             font-family: 'Roboto', sans-serif;
@@ -493,19 +431,9 @@
         
 
         <div class="webserial-output">
-        <div class="header-container">
-        <h2>Web Serial Terminal</h2>
-        <label class="switch">
-            <input type="checkbox" id="toggle-terminal">
-            <span class="slider round"></span>
-        </label>
+            <h2>Web Serial Terminal</h2>
+            <div id="terminal"></div>
         </div>
-        <div id="terminal" style="display: none;"> <!-- Terminal initially hidden -->
-        <!-- Terminal content will appear here -->
-        </div>
-        </div>
-
-
 
         <footer>
             DuinoI2C_ESP Dashboard by <a href="https://github.com/Itachi-Uchiha240">Itachi</a>
@@ -563,17 +491,6 @@
                 xhttp.open('PUT', 'UPDATE_SLIDER?VALUE=' + value, true);
                 xhttp.send();
             }, 100);
-        });
-        
-        // Web Serial Terminal Toggle
-        document.getElementById('toggle-terminal').addEventListener('change', function() {
-        const terminal = document.getElementById('terminal');
-    
-        if (this.checked) {
-            terminal.style.display = 'block'; // Show terminal
-        } else {
-            terminal.style.display = 'none'; // Hide terminal
-        }
         });
 
         // WLED Brightness
