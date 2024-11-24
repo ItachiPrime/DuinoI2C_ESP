@@ -19,6 +19,50 @@
         * {
             box-sizing: border-box;
         }
+        /* Toggle Switch Style */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            display: none;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4caf50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
 
         body {
             font-family: 'Roboto', sans-serif;
@@ -431,10 +475,13 @@
         
 
         <div class="webserial-output">
-    <h2>Web Serial Terminal</h2>
-    <button id="toggle-terminal" class="btn">Hide Terminal</button>
-    <div id="terminal"></div>
-</div>
+        <h2>Web Serial Terminal</h2>
+        <label class="switch">
+        <input type="checkbox" id="toggle-terminal">
+        <span class="slider round"></span>
+        </label>
+        <div id="terminal"></div>
+        </div>
 
 
         <footer>
@@ -495,19 +542,17 @@
             }, 100);
         });
         
-        //Webserial Toggle
-        document.getElementById('toggle-terminal').addEventListener('click', function() {
-    const terminal = document.getElementById('terminal');
-    const button = document.getElementById('toggle-terminal');
+        // Web Serial Terminal Toggle
+        document.getElementById('toggle-terminal').addEventListener('change', function() {
+        const terminal = document.getElementById('terminal');
     
-    if (terminal.style.display === 'none') {
-        terminal.style.display = 'block';
-        button.textContent = 'Hide Terminal';
-    } else {
-        terminal.style.display = 'none';
-        button.textContent = 'Show Terminal';
-    }
-});
+        if (this.checked) {
+            terminal.style.display = 'block'; // Show terminal
+        } else {
+            terminal.style.display = 'none'; // Hide terminal
+        }
+        });
+
         // WLED Brightness
         document.getElementById('wled-brightness').addEventListener('input', function() {
             var value = this.value;
