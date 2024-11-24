@@ -431,9 +431,11 @@
         
 
         <div class="webserial-output">
-            <h2>Web Serial Terminal</h2>
-            <div id="terminal"></div>
-        </div>
+    <h2>Web Serial Terminal</h2>
+    <button id="toggle-terminal" class="btn">Hide Terminal</button>
+    <div id="terminal"></div>
+</div>
+
 
         <footer>
             DuinoI2C_ESP Dashboard by <a href="https://github.com/Itachi-Uchiha240">Itachi</a>
@@ -492,7 +494,20 @@
                 xhttp.send();
             }, 100);
         });
-
+        
+        //Webserial Toggle
+        document.getElementById('toggle-terminal').addEventListener('click', function() {
+    const terminal = document.getElementById('terminal');
+    const button = document.getElementById('toggle-terminal');
+    
+    if (terminal.style.display === 'none') {
+        terminal.style.display = 'block';
+        button.textContent = 'Hide Terminal';
+    } else {
+        terminal.style.display = 'none';
+        button.textContent = 'Show Terminal';
+    }
+});
         // WLED Brightness
         document.getElementById('wled-brightness').addEventListener('input', function() {
             var value = this.value;
