@@ -596,16 +596,16 @@
             xhttp.send();
         });
 
-        document.getElementById('toggle-terminal').addEventListener('change', function() {
-        const terminal = document.getElementById('terminal');
-
-        if (this.checked) {
-        terminal.style.display = 'block'; // Show terminal
+        document.getElementById('toggle-terminal').addEventListener('change', function () {
+            const terminal = document.getElementById('terminal');
+            if (this.checked) {
+            terminal.style.display = 'block'; // Show terminal
+            connectWebSerial(); // Connect WebSerial when terminal is toggled on
         } else {
-        terminal.style.display = 'none'; // Hide terminal
+            terminal.style.display = 'none'; // Hide terminal
+            disconnectWebSerial(); // Disconnect WebSerial when terminal is toggled off
         }
         });
-
 
         // WebSerial functionality
         let port;
@@ -620,6 +620,17 @@
                 readLoop();
             } catch (err) {
                 console.error('Error:', err);
+            }
+        }
+
+        async function disconnectWebSerial() {
+            if (reader) {
+                reader.cancel();
+                reader = null;
+            }
+            if (port) {
+                await port.close();
+                port = null;
             }
         }
 
@@ -688,11 +699,6 @@
                 alert('An error occurred during file upload.');
             });
         }
-
-        // Initialize
-        window.onload = function() {
-            connectWebSerial();
-        };
     </script>
 </body>
 </html>
