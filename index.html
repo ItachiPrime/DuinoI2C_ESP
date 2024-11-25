@@ -290,7 +290,7 @@
         #input_el {
             width: 100%;
             padding: 5px;
-            background-color: #333;
+            background-color: #000000;
             color: white;
             border: none;
             border-radius: 3px;
@@ -433,11 +433,11 @@
 
         <div class="info-panel">
             <div class="info-item">
-                <span class="info-label">IP Address:<span id="ip-address" class="info-value">192.168.60.238</span></span>
+                <span class="info-label">IP Address:<span id="ip-address" class="info-value">Loading...</span></span>
                 
             </div>
             <div class="info-item">
-                <span class="info-label">Firmware Version:<span id="firmware-version" class="info-value">1.0.0</span></span>
+                <span class="info-label">Firmware Version: <span id="firmware-version" class="info-value">Loading...</span></span>
                 
             </div>
         </div>
@@ -514,6 +514,7 @@
     </div>
 
     <script>
+
         // Helper function to create XMLHttpRequest
         function createXmlHttpObject() {
             if (window.XMLHttpRequest) {
@@ -522,6 +523,34 @@
             return new ActiveXObject('Microsoft.XMLHTTP');
         }
 
+        //Function to load IP address
+        function loadIPAddress() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("ip-address").innerHTML = this.responseText;
+            }
+        };
+            xhttp.open("GET", "GET_IP", true);
+            xhttp.send();
+        }
+
+        //Function to load firmware version
+        function loadFirmwareVersion() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("firmware-version").innerHTML = this.responseText;
+            }
+        };
+            xhttp.open("GET", "GET_VER", true);
+            xhttp.send();
+        }
+
+        window.onload = function() {
+            loadFirmwareVersion();
+            loadIPAddress()
+        };
 
         // OLED Toggle
         document.getElementById('oled-toggle').addEventListener('click', function() {
@@ -721,7 +750,7 @@
                 if (this.checked) {
                     terminal.style.display = "block";
                     inputDiv.style.display = "block";
-                    terminal.innerHTML = ""; // Clear the terminal
+                    terminal.innerHTML="";
                     startSocket();   // Start WebSocket connection
                     startEvents();   // Start SSE connection
                 } else {
