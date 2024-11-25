@@ -272,7 +272,7 @@
 
         #terminal {
             display: none;
-            background-color: #222;
+            background-color: #000000;
             padding: 10px;
             height: 300px;
             overflow-y: auto;
@@ -606,15 +606,27 @@
             for (var i = 0; i < str.length; ++i) buf[i] = str.charCodeAt(i);
             ws.send(buf);
         }
-    
+
+        //Scrolling Function
+        function stb() {
+            const terminal = ge("terminal");
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
         // Function to add messages to the terminal
         function addMessage(m) {
             var msg = ce("div");
-            m = "<" + new Date().toLocaleTimeString() + ">   " + m;
-            msg.innerText = m;
+            var timestamp = new Date().toLocaleTimeString();
+            m = "<" + timestamp + ">   " + m;
+
+            // Optional: If you want to escape HTML (to prevent injection), you can do it like this:
+            const escapedMessage = document.createTextNode(m);  // Safely escape HTML
+
+            msg.appendChild(escapedMessage);  // Use text node to avoid injection
             ge("terminal").appendChild(msg);
-            stb();
+            stb();  // Scroll to the bottom
         }
+
     
         // WebSocket connection setup
         function startSocket() {
@@ -709,6 +721,7 @@
                 if (this.checked) {
                     terminal.style.display = "block";
                     inputDiv.style.display = "block";
+                    terminal.innerHTML = ""; // Clear the terminal
                     startSocket();   // Start WebSocket connection
                     startEvents();   // Start SSE connection
                 } else {
