@@ -271,42 +271,35 @@
         }
 
         #terminal {
-            margin-top: 25px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--terminal-text);
-            background-color: #000000;
-            border-radius: 10px;
+            display: none;
+            background-color: #222;
             padding: 10px;
-            height: 200px;
+            height: 300px;
             overflow-y: auto;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        #input-div {
-            display: flex;
-            align-items: center;
-            color: var(--terminal-text);
-        }
-
-        #input-el {
-            flex-grow: 1;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: none;
+            font-family: monospace;
             border-radius: 5px;
-            color: var(--terminal-text);
-            font-family: 'Roboto Mono', monospace;
-            font-size: 14px;
-            padding: 8px 12px;
-            margin-left: 5px;
+            margin-top: 20px;
+            color: #DDDDDD;
         }
 
-        #input-el:focus {
+        #input_div {
+            display: none;
+            margin-top: 10px;
+        }
+
+        #input_el {
+            width: 100%;
+            padding: 5px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        #input_el:focus {
             outline: none;
-            background-color: rgba(255, 255, 255, 0.2);
         }
 
         footer {
@@ -339,8 +332,6 @@
             margin-top: 0%;
             margin-bottom: 0%;
         }
-
-    
 
         @media (max-width: 768px) {
             
@@ -509,8 +500,11 @@
                     <span class="webserial-slider round"></span>
                 </label>
             </div>
-            <div id="terminal" style="display: none;">
+            <div id="terminal">
                 <!-- Terminal content will appear here -->
+            </div>
+            <div id="input_div">
+                <input type="text" id="input_el" placeholder="Type a command...">
             </div>
         </div>
 
@@ -596,74 +590,102 @@
             xhttp.send();
         });
         
-        // Terminal toggle
-        document.getElementById('toggle-terminal').addEventListener('change', function () {
-            const terminal = document.getElementById('terminal');
-            if (this.checked) {
-            terminal.style.display = 'block'; // Show terminal
-            connectWebSerial(); // Connect WebSerial when terminal is toggled on
-        } else {
-            terminal.style.display = 'none'; // Hide terminal
-            disconnectWebSerial(); // Disconnect WebSerial when terminal is toggled off
-        }
-        });
+        //Webserial fuctionality
+        var lastinput = "";
+        var ws = null;
 
-        // WebSerial functionality
-        let port;
-        let reader;
-        const terminal = document.getElementById('terminal');
-        const inputEl = document.getElementById('input-el');
-
-        async function connectWebSerial() {
-            try {
-                port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 500000 });
-                readLoop();
-            } catch (err) {
-                console.error('Error:', err);
-            }
+        function ge(s) {
+            return document.getElementById(s);
         }
 
-        async function disconnectWebSerial() {
-            if (reader) {
-                reader.cancel();
-                reader = null;
-            }
-            if (port) {
-                await port.close();
-                port = null;
-            }
+        function ce(s) {
+            return document.createElement(s);
         }
 
-        async function readLoop() {
-            while (port.readable) {
-                reader = port.readable.getReader();
-                try {
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) break;
-                        terminal.textContent += new TextDecoder().decode(value);
-                        terminal.scrollTop = terminal.scrollHeight;
+        function stb() {
+            const terminal = ge("terminal");
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function sendBlob(str) {
+            var buf = new Uint8Array(str.length);
+            for (var i = 0; i < str.length; ++i) buf[i] = str.charCodeAt(i);
+            ws.send(buf);
+        }
+
+        function addMessage(m) {
+            const msg = ce("p");
+            m = "<" + new Date().toLocaleTimeString() + "> " + m;
+            msg.innerText = m;
+            ge("terminal").appendChild(msg);
+            stb();
+        }
+
+        function startSocket() {
+            ws = new WebSocket("ws://" + document.location.host + "/ws", ["arduino"]);
+            ws.binaryType = "arraybuffer";
+            ws.onopen = function (e) {
+                addMessage("Connected");
+            };
+            ws.onclose = function (e) {
+                addMessage("Disconnected");
+                ws = null;
+            };
+            ws.onerror = function (e) {
+                console.error("WebSocket error:", e);
+                addMessage("Error occurred");
+            };
+            ws.onmessage = function (e) {
+                let msg = "";
+                if (e.data instanceof ArrayBuffer) {
+                    msg += "BIN:";
+                    const bytes = new Uint8Array(e.data);
+                    for (let i = 0; i < bytes.length; i++) {
+                        msg += String.fromCharCode(bytes[i]);
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    reader.releaseLock();
+                } else {
+                    msg += e.data;
                 }
+                addMessage(msg);
+            };
+            ge("input_el").onkeydown = function (e) {
+                stb();
+                if (e.keyCode === 13 && ge("input_el").value !== "") {
+                    ws.send(ge("input_el").value);
+                    lastinput = ge("input_el").value;
+                    ge("input_el").value = "";
+                } else if (e.keyCode === 13 && ge("input_el").value === "") {
+                    ge("input_el").value = lastinput;
+                }
+            };
+        }
+
+        function endSocket() {
+            if (ws) {
+                ws.onclose = function () {}; // disable onclose handler
+                ws.close();
+                ws = null;
             }
         }
 
-        inputEl.addEventListener('keydown', async (e) => {
-            if (e.key === 'Enter') {
-                const command = inputEl.value + '\n';
-                inputEl.value = '';
-                if (port && port.writable) {
-                    const writer = port.writable.getWriter();
-                    await writer.write(new TextEncoder().encode(command));
-                    writer.releaseLock();
-                }
+        document.getElementById("toggle-terminal").addEventListener("change", function () {
+            const terminal = ge("terminal");
+            const inputDiv = ge("input_div");
+
+            if (this.checked) {
+                terminal.style.display = "block";
+                inputDiv.style.display = "block";
+                startSocket(); // Start WebSocket when toggled on
+            } else {
+                terminal.style.display = "none";
+                inputDiv.style.display = "none";
+                endSocket(); // Stop WebSocket when toggled off
             }
         });
+
+        window.onbeforeunload = function () {
+            endSocket();
+        };
 
         // Firmware upload functionality
         document.getElementById('firmware-form').addEventListener('submit', function(e) {
