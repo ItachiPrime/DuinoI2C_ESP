@@ -701,8 +701,7 @@
             }
         }
     
-        // Function to initialize both WebSocket and SSE on page load
-        function onBodyLoad() {
+        // Function to initialize both WebSocket and SSE on page loa
             // Add event listener for toggle switch
             ge("toggle-terminal").addEventListener("change", function () {
                 const terminal = ge("terminal");
@@ -720,7 +719,6 @@
                     endEvents();     // End SSE connection
                 }
             });
-        }
     
         // Ensure both WebSocket and SSE connections are closed when the page is unloaded or refreshed
         window.onbeforeunload = function () {
