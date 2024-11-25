@@ -617,7 +617,7 @@
         async function connectWebSerial() {
             try {
                 port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 512000 });
+                await port.open({ baudRate: 500000 });
                 readLoop();
             } catch (err) {
                 console.error('Error:', err);
