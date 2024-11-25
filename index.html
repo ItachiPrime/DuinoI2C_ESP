@@ -595,7 +595,8 @@
             xhttp.open('PUT', 'BUTTON_1', true);
             xhttp.send();
         });
-
+        
+        // Terminal toggle
         document.getElementById('toggle-terminal').addEventListener('change', function () {
             const terminal = document.getElementById('terminal');
             if (this.checked) {
@@ -616,7 +617,7 @@
         async function connectWebSerial() {
             try {
                 port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 500000 });
+                await port.open({ baudRate: 512000 });
                 readLoop();
             } catch (err) {
                 console.error('Error:', err);
