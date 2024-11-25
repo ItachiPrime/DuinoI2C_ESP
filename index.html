@@ -592,100 +592,141 @@
         
         //Webserial fuctionality
         var lastinput = "";
-        var ws = null;
+    var ws = null;
+    var es = null;
 
-        function ge(s) {
-            return document.getElementById(s);
-        }
+    // Helper functions
+    function ge(s) { return document.getElementById(s); }
+    function ce(s) { return document.createElement(s); }
+    function stb() { window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight); }
 
-        function ce(s) {
-            return document.createElement(s);
-        }
+    // Function to send a string as binary via WebSocket
+    function sendBlob(str) {
+        var buf = new Uint8Array(str.length);
+        for (var i = 0; i < str.length; ++i) buf[i] = str.charCodeAt(i);
+        ws.send(buf);
+    }
 
-        function stb() {
-            const terminal = ge("terminal");
-            terminal.scrollTop = terminal.scrollHeight;
-        }
+    // Function to add messages to the terminal
+    function addMessage(m) {
+        var msg = ce("div");
+        m = "<" + new Date().toLocaleTimeString() + ">   " + m;
+        msg.innerText = m;
+        ge("terminal").appendChild(msg);
+        stb();
+    }
 
-        function sendBlob(str) {
-            var buf = new Uint8Array(str.length);
-            for (var i = 0; i < str.length; ++i) buf[i] = str.charCodeAt(i);
-            ws.send(buf);
-        }
+    // WebSocket connection setup
+    function startSocket() {
+        ws = new WebSocket('ws://' + document.location.host + '/ws', ['arduino']);
+        ws.binaryType = "arraybuffer";
 
-        function addMessage(m) {
-            const msg = ce("p");
-            m = "<" + new Date().toLocaleTimeString() + "> " + m;
-            msg.innerText = m;
-            ge("terminal").appendChild(msg);
-            stb();
-        }
+        ws.onopen = function (e) {
+            addMessage("Connected");
+        };
 
-        function startSocket() {
-            ws = new WebSocket("ws://" + document.location.host + "/ws", ["arduino"]);
-            ws.binaryType = "arraybuffer";
-            ws.onopen = function (e) {
-                addMessage("Connected");
-            };
-            ws.onclose = function (e) {
-                addMessage("Disconnected");
-                ws = null;
-            };
-            ws.onerror = function (e) {
-                console.error("WebSocket error:", e);
-                addMessage("Error occurred");
-            };
-            ws.onmessage = function (e) {
-                let msg = "";
-                if (e.data instanceof ArrayBuffer) {
-                    msg += "BIN:";
-                    const bytes = new Uint8Array(e.data);
-                    for (let i = 0; i < bytes.length; i++) {
-                        msg += String.fromCharCode(bytes[i]);
-                    }
-                } else {
-                    msg += e.data;
+        ws.onclose = function (e) {
+            addMessage("Disconnected");
+            setTimeout(startSocket, 3000);
+        };
+
+        ws.onerror = function (e) {
+            console.log("ws error", e);
+            addMessage("Error");
+        };
+
+        ws.onmessage = function (e) {
+            var msg = "";
+            if (e.data instanceof ArrayBuffer) {
+                msg += "BIN:";
+                var bytes = new Uint8Array(e.data);
+                for (var i = 0; i < bytes.length; i++) {
+                    msg += String.fromCharCode(bytes[i]);
                 }
-                addMessage(msg);
-            };
-            ge("input_el").onkeydown = function (e) {
-                stb();
-                if (e.keyCode === 13 && ge("input_el").value !== "") {
-                    ws.send(ge("input_el").value);
-                    lastinput = ge("input_el").value;
-                    ge("input_el").value = "";
-                } else if (e.keyCode === 13 && ge("input_el").value === "") {
-                    ge("input_el").value = lastinput;
-                }
-            };
-        }
-
-        function endSocket() {
-            if (ws) {
-                ws.onclose = function () {}; // disable onclose handler
-                ws.close();
-                ws = null;
+            } else {
+                msg += e.data;
             }
-        }
+            addMessage(msg);
+        };
 
-        document.getElementById("toggle-terminal").addEventListener("change", function () {
+        // Handling input from the user (terminal input)
+        ge("input_el").onkeydown = function (e) {
+            stb();
+            if (e.keyCode == 13 && ge("input_el").value != "") {
+                ws.send(ge("input_el").value);
+                lastinput = ge("input_el").value;
+                ge("input_el").value = "";
+            } else if (e.keyCode == 13 && ge("input_el").value == "") {
+                ge("input_el").value = lastinput;
+            }
+        };
+    }
+
+    // End WebSocket connection
+    function endSocket() {
+        if (ws) {
+            ws.onclose = function () {}; // Disable onclose handler first
+            ws.close();
+        }
+    }
+
+    // SSE connection setup (for receiving events from server)
+    function startEvents() {
+        es = new EventSource('/events');
+
+        es.onopen = function (e) {
+            addMessage("Events Opened");
+        };
+
+        es.onerror = function (e) {
+            if (e.target.readyState != EventSource.OPEN) {
+                addMessage("Events Closed");
+            }
+        };
+
+        es.onmessage = function (e) {
+            addMessage("Event: " + e.data);
+        };
+
+        // Handling a specific 'ota' event (custom server-side event)
+        es.addEventListener('ota', function (e) {
+            addMessage("Event[ota]: " + e.data);
+        }, false);
+    }
+
+    // End SSE connection
+    function endEvents() {
+        if (es) {
+            es.close();
+        }
+    }
+
+    // Function to initialize both WebSocket and SSE on page load
+    function onBodyLoad() {
+        // Add event listener for toggle switch
+        ge("toggle-terminal").addEventListener("change", function () {
             const terminal = ge("terminal");
             const inputDiv = ge("input_div");
 
             if (this.checked) {
                 terminal.style.display = "block";
                 inputDiv.style.display = "block";
-                startSocket(); // Start WebSocket when toggled on
+                startSocket();   // Start WebSocket connection
+                startEvents();   // Start SSE connection
             } else {
                 terminal.style.display = "none";
                 inputDiv.style.display = "none";
-                endSocket(); // Stop WebSocket when toggled off
+                endSocket();     // End WebSocket connection
+                endEvents();     // End SSE connection
             }
         });
+    }
 
-        window.onbeforeunload = function () {
-            endSocket();
-        };
+    // Ensure both WebSocket and SSE connections are closed when the page is unloaded or refreshed
+    window.onbeforeunload = function () {
+        endSocket();    // Close WebSocket connection
+        endEvents();    // Close SSE connection
+    };
 
         // Firmware upload functionality
         document.getElementById('firmware-form').addEventListener('submit', function(e) {
