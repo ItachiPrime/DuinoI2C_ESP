@@ -609,7 +609,7 @@
     
         // Function to add messages to the terminal
         function addMessage(m) {
-            var msg = ce("div");
+            var msg = ce("p");
             m = "<" + new Date().toLocaleTimeString() + ">   " + m;
             msg.innerText = m;
             ge("terminal").appendChild(msg);
