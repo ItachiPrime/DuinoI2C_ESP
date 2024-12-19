@@ -307,11 +307,101 @@
         }
 
         footer {
-            text-align: center;
+            background-color: #1a1a1a;
+            color: #ffffff;
             padding: 20px;
-            margin-top: 30px;
-            color: #808080;
-            font-size: 0.8rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff0000, transparent);
+            animation: slide 3s linear infinite;
+        }
+
+        @keyframes slide {
+            100% { left: 100%; }
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .itachi-link {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: bold;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .itachi-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #ff0000;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .itachi-link:hover {
+            color: #ff3333;
+        }
+
+        .itachi-link:hover::after {
+            transform: scaleX(1);
+        }
+
+        .sharingan {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff0000;
+            position: relative;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+
+        .sharingan::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background-color: #1a1a1a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .sharingan::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid #ff0000;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .firmware-upload {
@@ -503,8 +593,13 @@
         </div>
 
         <footer>
-            DuinoI2C_ESP Dashboard by <a target="_blank" href="https://github.com/Itachi-Uchiha240">Itachi</a>
-        </footer>
+        <div class="footer-content">
+            DuinoI2C_ESP Dashboard by 
+            <span class="sharingan"></span>
+            <a href="https://github.com/ItachiPrime" target="_blank" rel="noopener noreferrer" class="itachi-link">Itachi</a>
+            <span class="sharingan"></span>
+        </div>
+    </footer>
     </div>
 
     <script>
