@@ -340,46 +340,6 @@
             transform: scaleX(1);
         }
 
-        .sharingan {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #ff0000;
-            position: relative;
-            margin: 0 2px;
-        }
-
-        .sharingan::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 6px;
-            height: 6px;
-            background-color: #1a1a1a;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .sharingan::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 1px solid #ff0000;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
         .firmware-upload {
             width:21vw;
             background-color: #F0F0F0;
@@ -571,9 +531,7 @@
         <footer>
         <div class="footer-content">
             DuinoI2C_ESP Dashboard by 
-            <span class="sharingan"></span>
             <a href="https://github.com/ItachiPrime" target="_blank" rel="noopener noreferrer" class="itachi-link">Itachi</a>
-            <span class="sharingan"></span>
         </div>
     </footer>
     </div>
