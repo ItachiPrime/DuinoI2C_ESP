@@ -516,13 +516,12 @@
         }
 
         //Function to load IP address
-        function loadIPAddress(callback) {
+        function loadIPAddress() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            // Pass the retrieved IP address to the callback function
-            callback(this.responseText.trim());
-        }
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("ip-address").innerHTML = this.responseText;
+            }
         };
             xhttp.open("GET", "GET_IP", true);
             xhttp.send();
@@ -614,27 +613,41 @@
 
         // Update ESP
         document.getElementById('update-esp').addEventListener('click', function() {
-        // Retrieve the IP address before making the request
-        loadIPAddress(function(ipAddress) {
-        var xhttp = createXmlHttpObject();
+        // Use the existing loadIPAddress() function to get the IP address
+        loadIPAddress();
+    
+        // Get the IP address from the element after it's populated
+        setTimeout(function() {
+            var ipAddress = document.getElementById("ip-address").innerText.trim();
+    
+            if (ipAddress) {
+                var xhttp = createXmlHttpObject();
+    
+                // Construct the firmware URL using the retrieved IP address
+                var firmwareUrl = `http://${ipAddress}/firmware`;
+    
+                // Configure the GET request
+                xhttp.open("GET", firmwareUrl, true);
+    
+                // Handle the response
+                xhttp.onreadystatechange = function() {
+                    if (xhttp.readyState === 4) { // 4 means the request is complete
+                        if (xhttp.status === 200) { // 200 means the request was successful
+                            console.log("Firmware page retrieved successfully:");
+                            console.log(xhttp.responseText); // Log the response content
+                        } else {
+                            console.error("Failed to retrieve firmware page. Status:", xhttp.status);
+                        }
+                    }
+                };
 
-        // Construct the firmware URL using the retrieved IP address
-        var firmwareUrl = `http://${ipAddress}/firmware`;
-
-        // Configure the GET request
-        xhttp.open("GET", firmwareUrl, true);
-
-        // Handle the response
-        xhttp.onreadystatechange = function() {
-            if (xhttp.readyState === 4) { // 4 means the request is complete
-                if (xhttp.status === 200) { // 200 means the request was successful
-                    console.log("Firmware page retrieved successfully:");
-                    console.log(xhttp.responseText); // Log the response content
-                } else {
-                    console.error("Failed to retrieve firmware page. Status:", xhttp.status);
-                }
-            }
-        };
+            // Send the GET request
+            xhttp.send();
+        } else {
+            console.error("Failed to retrieve the IP address.");
+        }
+        }, 500); // Wait for 500ms to ensure the IP address is retrieved
+        });
 
         // Send the GET request
         xhttp.send();
