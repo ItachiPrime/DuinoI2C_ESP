@@ -550,8 +550,8 @@
             var xhttp = createXmlHttpObject();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                    var status = this.responseText === '0' ? 'OFF' : 'ON';
-                    document.getElementById('oled-toggle').textContent = 'OLED Screen: ' + status;
+                    var status = this.responseText === '0' ? 'OFF':'ON';
+                    document.getElementById('oled-toggle').textContent = 'OLED Screen:' + status;
                 }
             };
             xhttp.open('PUT', 'BUTTON_0', true);
@@ -563,8 +563,8 @@
             var xhttp = createXmlHttpObject();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                    var status = this.responseText === '0' ? 'ON' : 'OFF';
-                    document.getElementById('led-toggle').textContent = 'Onboard LED: ' + status;
+                    var status = this.responseText === '0' ? 'ON':'OFF';
+                    document.getElementById('led-toggle').textContent = 'Onboard LED:' + status;
                 }
             };
             xhttp.open('PUT', 'BUTTON_2', true);
