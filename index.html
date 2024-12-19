@@ -21,7 +21,6 @@
             box-sizing: border-box;
         }
         
-        /* Web Serial Container Styles */
         .webserial-container {
             margin: 20px auto;
             padding: 20px;
@@ -31,14 +30,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Flex container for the header */
         .header-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* Styles for the h2 */
         .header-container h2 {
             padding-bottom: 0px;
             border: none;
@@ -46,7 +43,6 @@
             font-size: 1.5rem;
         }
 
-        /* Scoped Toggle Switch Style */
         .webserial-switch {
             position: relative;
             display: inline-block;
@@ -339,29 +335,6 @@
             transform: scaleX(1);
         }
 
-        .firmware-upload {
-            width:21vw;
-            background-color: #F0F0F0;
-            border-radius: 15px;
-            padding: 20px;
-        }
-
-        .firmware-upload form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .firmware-upload input[type="file"] {
-            margin-bottom: 0px;
-            font-size: 1rem;
-        }
-
-        .fm{
-            margin-top: 0%;
-            margin-bottom: 0%;
-        }
-
         @media (max-width: 768px) {
             
             body {
@@ -450,14 +423,6 @@
                 font-size: 12px;
                 padding: 6px 10px;
             }
-
-            .firmware-upload input[type="file"] {
-                font-size: 0.9rem;
-            }
-            
-            .firmware-upload {
-                width:auto;
-            }
         }
     </style>
 </head>
@@ -516,8 +481,6 @@
                 </div>
             </div>
         </div>
-
-        
 
         <div class="webserial-container">
             <div class="header-container">
