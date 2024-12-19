@@ -24,7 +24,6 @@
         .webserial-container {
             margin: 20px auto;
             padding: 20px;
-            max-width: 90vw;
             border: 1px solid #ddd;
             border-radius: 15px;
             background-color: #f9f9f9;
@@ -104,7 +103,7 @@
 
         .container {
             max-width: 1500px;
-            width: 95%;
+            width: 92%;
             margin: 5px auto;
             background-color: #000000;
             border-radius: 20px;
@@ -117,6 +116,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 30px;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
 
@@ -138,7 +138,7 @@
             background-color: var(--secondary-color);
             border-radius: 15px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
             align-items:center;
@@ -169,7 +169,7 @@
         }
 
         .control-group {
-            width:24vw;
+            width:-webkit-fill-available;
             background-color: #F0F0F0;
             border-radius: 15px;
             padding: 20px;
@@ -187,6 +187,10 @@
         
         .control-item {
             margin-bottom: 20px;
+        }
+
+        .control-item1 {
+            margin-bottom: 40px;
         }
 
         .control-label {
@@ -371,7 +375,7 @@
             }
 
             .control-group {
-                width:83vw;
+                width:auto;
                 padding: 15px;
             }
 
@@ -419,7 +423,7 @@
             }
             
             .firmware-upload {
-                width:83vw;
+                width:auto;
             }
         }
     </style>
@@ -445,7 +449,7 @@
         <div class="control-panel">
             <div class="control-group">
                 <h2>OLED Controls</h2>
-                <div class="control-item">
+                <div class="control-item1">
                     <button id="oled-toggle" class="btn">OLED Screen:ON</button>
                 </div>
                 <div class="control-item">
@@ -458,7 +462,7 @@
 
             <div class="control-group">
                 <h2>LED Controls</h2>
-                <div class="control-item">
+                <div class="control-item1">
                     <button id="led-toggle" class="btn">Onboard LED:ON</button>
                 </div>
                 <div class="control-item">
@@ -473,20 +477,8 @@
                 <h2>System Controls</h2>
                 <div class="control-item">
                     <button id="restart-esp" class="btn warning">Restart ESP</button>
+                    <button id="update-esp" class="btn warning">Update ESP</button>
                 </div>
-            </div>
-            <div class="firmware-upload">
-                <h2>Firmware Upload</h2>
-                <form id="firmware-form" enctype="multipart/form-data">
-                    <h3 class="fm">Firmware:</h3>
-                    <input type="file" accept=".bin,.bin.gz" name="firmware" id="firmware-file">
-                    <button type="submit" class="btn">Update Firmware</button>
-                </form>
-                <form id="filesystem-form" enctype="multipart/form-data">
-                    <h3 class="fm">FileSystem:</h3>
-                    <input type="file" accept=".bin,.bin.gz" name="filesystem" id="filesystem-file">
-                    <button type="submit" class="btn">Update FileSystem</button>
-                </form>
             </div>
         </div>
 
@@ -524,12 +516,13 @@
         }
 
         //Function to load IP address
-        function loadIPAddress() {
+        function loadIPAddress(callback) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("ip-address").innerHTML = this.responseText;
-            }
+        if (this.readyState == 4 && this.status == 200) {
+            // Pass the retrieved IP address to the callback function
+            callback(this.responseText.trim());
+        }
         };
             xhttp.open("GET", "GET_IP", true);
             xhttp.send();
@@ -618,8 +611,38 @@
             xhttp.open('PUT', 'BUTTON_1', true);
             xhttp.send();
         });
+
+        // Update ESP
+        document.getElementById('update-esp').addEventListener('click', function() {
+        // Retrieve the IP address before making the request
+        loadIPAddress(function(ipAddress) {
+        var xhttp = createXmlHttpObject();
+
+        // Construct the firmware URL using the retrieved IP address
+        var firmwareUrl = `http://${ipAddress}/firmware`;
+
+        // Configure the GET request
+        xhttp.open("GET", firmwareUrl, true);
+
+        // Handle the response
+        xhttp.onreadystatechange = function() {
+            if (xhttp.readyState === 4) { // 4 means the request is complete
+                if (xhttp.status === 200) { // 200 means the request was successful
+                    console.log("Firmware page retrieved successfully:");
+                    console.log(xhttp.responseText); // Log the response content
+                } else {
+                    console.error("Failed to retrieve firmware page. Status:", xhttp.status);
+                }
+            }
+        };
+
+        // Send the GET request
+        xhttp.send();
+
+        });
+        });
         
-        //Webserial fuctionality
+        // Webserial fuctionality
         var lastinput = "";
         var ws = null;
         var es = null;
@@ -636,10 +659,18 @@
             ws.send(buf);
         }
 
-        //Scrolling Function
+        // Scrolling Function
         function stb() {
-            const terminal = ge("terminal");
-            terminal.scrollTop = terminal.scrollHeight;
+        // Detect if the device is not a mobile phone
+        if (!isMobileDevice()) {
+        const terminal = ge("terminal");
+        terminal.scrollTop = terminal.scrollHeight;
+        }
+        }
+
+        // Function to detect if the device is mobile
+        function isMobileDevice() {
+        return /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
         }
 
         // Function to add messages to the terminal
@@ -767,41 +798,6 @@
             endEvents();    // Close SSE connection
         };
 
-        // Firmware upload functionality
-        document.getElementById('firmware-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            uploadFile('firmware');
-        });
-
-        document.getElementById('filesystem-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            uploadFile('filesystem');
-        });
-
-        function uploadFile(type) {
-            const fileInput = document.getElementById(type + '-file');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert('Please select a file first.');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append(type, file);
-
-            fetch('/' + type, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(result => {
-                alert(result);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred during file upload.');
-            });
-        }
     </script>
 </body>
 </html>
