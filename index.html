@@ -616,41 +616,31 @@
 
         // Update ESP
         document.getElementById('update-esp').addEventListener('click', function() {
-        // Use the existing loadIPAddress() function to get the IP address
-        loadIPAddress();
-    
-        // Get the IP address from the element after it's populated
-        setTimeout(function() {
-            var ipAddress = document.getElementById("ip-address").innerText.trim();
-    
-            if (ipAddress) {
-                var xhttp = createXmlHttpObject();
-    
-                // Construct the firmware URL using the retrieved IP address
-                var firmwareUrl = `http://${ipAddress}/firmware`;
-    
-                // Configure the GET request
-                xhttp.open("GET", firmwareUrl, true);
-    
-                // Handle the response
-                xhttp.onreadystatechange = function() {
-                    if (xhttp.readyState === 4) { // 4 means the request is complete
-                        if (xhttp.status === 200) { // 200 means the request was successful
-                            console.log("Firmware page retrieved successfully:");
-                            console.log(xhttp.responseText); // Log the response content
-                        } else {
-                            console.error("Failed to retrieve firmware page. Status:", xhttp.status);
-                        }
-                    }
-                };
+            // Use the existing loadIPAddress() function to get the IP address
+            loadIPAddress();
 
-            // Send the GET request
-            xhttp.send();
-        } else {
-            console.error("Failed to retrieve the IP address.");
-        }
-        }, 500); // Wait for 500ms to ensure the IP address is retrieved
+            // Wait for a moment to allow the IP address to populate
+            setTimeout(function() {
+                const ipAddressElement = document.getElementById("ip-address");
+                if (ipAddressElement) {
+                    const ipAddress = ipAddressElement.innerText.trim();
+
+                    if (ipAddress) {
+                        // Construct the firmware URL
+                        const firmwareUrl = `http://${ipAddress}/firmware`;
+
+                        // Open the firmware page in a new tab
+                        window.open(firmwareUrl, '_blank');
+                        console.log(`Opened firmware page: ${firmwareUrl}`);
+                    } else {
+                        console.error("Failed to retrieve the IP address.");
+                    }
+                } else {
+                    console.error("IP address element not found.");
+                }
+            }, 500); // Adjust delay as needed
         });
+
         
         // Webserial fuctionality
         var lastinput = "";
