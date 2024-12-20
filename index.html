@@ -9,25 +9,106 @@
     <style>
         :root {
             --primary-color: #ff6214;
-            --secondary-color: #4ECDC4;
             --accent-color: #FFD93D;
-            --background-color: #000000;
-            --text-color: #333333;
-            --terminal-bg: #2C3E50;
-            --terminal-text: #ECF0F1;
         }
 
         * {
             box-sizing: border-box;
         }
+
+        .head{
+            width: max-content;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            text-align: center;
+            gap:5px;
+            align-items: center;
+        }
+
+        #darkModeToggle {
+            margin-left: auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        #darkModeToggle .icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            transition: opacity 0.3s;
+        }
+
+        #darkModeToggle .icon::before,
+        #darkModeToggle .icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            transition: opacity 0.3s;
+        }
+
+        #darkModeToggle .icon::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E");
+            opacity: 1;
+        }
+
+        #darkModeToggle .icon::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E");
+            opacity: 0;
+        }
+
+        #darkModeToggle.dark {
+            background-color: #1a1a1a;
+        }
+
+        #darkModeToggle.dark .icon::before {
+            opacity: 0;
+        }
+
+        #darkModeToggle.dark .icon::after {
+            opacity: 1;
+        }
+
+        body {
+        transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #161616;
+        }
         
         .webserial-container {
+            transition: background-color 0.3s, color 0.3s;
             margin: 20px auto;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 15px;
-            background-color: #f9f9f9;
+            background-color: #f5f5f5;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .webserial-container.dark{
+            background-color: #000000;
         }
 
         .header-container {
@@ -61,7 +142,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #ffffff;
             transition: 0.4s;
             border-radius: 25px;
         }
@@ -88,7 +169,7 @@
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: var(--background-color);
+            background-color: #efefef;
             color: var(--text-color);
             margin: 0;
             padding: 20px;
@@ -99,27 +180,32 @@
         }
 
         .container {
+            transition: background-color 0.3s, color 0.3s;
             width:75%;
             max-width: 1500px;
             margin: 5px auto;
-            background-color: #121212;
+            background-color: #ffffff;
             border-radius: 20px;
             padding: 20px 30px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
+        .container.dark{
+            background-color: #000000;
+        }
 
         header {
+            margin-top: 5px;
+            position: relative;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
             flex-wrap: wrap;
         }
 
         .logo {
-            width: 60px;
-            height: 60px;
-            margin-right: 20px;
+            width: 50px;
+            height: 50px;
         }
 
         h1 {
@@ -131,7 +217,9 @@
         }
 
         .info-panel {
-            background-color: var(--secondary-color);
+            transition: background-color 0.3s, color 0.3s;
+            border: 1px solid #ddd;
+            background-color:#f5f5f5;
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
@@ -139,6 +227,11 @@
             flex-wrap: wrap;
             align-items:center;
             justify-content: space-between;
+            color: #000000;
+        }
+
+        .info-panel.dark{
+            background-color: #000000;
             color: #FFFFFF;
         }
 
@@ -165,10 +258,16 @@
         }
 
         .control-group {
+            transition: background-color 0.3s, color 0.3s;
+            border: 1px solid #ddd;
             width:-webkit-fill-available;
             background-color: #F0F0F0;
             border-radius: 15px;
             padding: 20px;
+        }
+
+        .control-group.dark {
+            background-color: #000000;
         }
 
         h2 {
@@ -194,6 +293,10 @@
             margin-bottom: 10px;
             font-size: 1rem;
             font-weight: bold;
+        }
+
+        .control-label.dark{
+            color: #FFFFFF;
         }
 
         .btn {
@@ -235,7 +338,7 @@
             width: 100%;
             height: 15px;
             border-radius: 10px;
-            background: #cdcdcd;
+            background: #ffffff;
             outline: none;
             opacity: 0.7;
             transition: opacity .2s;
@@ -279,7 +382,12 @@
             font-family: monospace;
             border-radius: 5px;
             margin-top: 20px;
-            color: #DDDDDD;
+            color: #ffffff;
+        }
+
+        #terminal.dark{
+            background-color: #FFFFFF;
+            color: #000000;
         }
 
         #input_div {
@@ -298,14 +406,27 @@
             font-size: 14px;
         }
 
+        #input_el.dark{
+            background-color: #ffffff;
+            color: #000000;
+        }
+
         #input_el:focus {
             outline: none;
         }
 
         footer {
-            color: #ffffff;
+            color: #000000;
             padding: 10px 10px 0px 10px;
             text-align: center;
+        }
+
+        .footer-content{
+            color:#000000;
+        }
+
+        .footer-content.dark{
+            color:#FFFFFF;
         }
 
         .itachi-link {
@@ -342,6 +463,26 @@
                 padding: 10px;
                 font-size: 14px;
             }
+            
+            .head{
+                left: 44%;
+            }
+
+            header a{
+                height:25px;
+                width:25px;
+            }
+
+            #darkModeToggle {
+                width:26px;
+                height:26px;
+                margin-top:2px;
+            }
+
+            #darkModeToggle .icon{
+                width:18px;
+                height:18px;
+            }
 
             .info-label {
                 font-size: 1rem;
@@ -359,7 +500,6 @@
             header {
                gap: 5px;
                align-items: center;
-               flex-direction: row;
             }
 
             .logo {
@@ -431,19 +571,23 @@
 <body>
     <div class="container">
         <header>
-            <a href="https://duinocoin.com/" target="_blank">
+            <div class="head">
+            <a href="https://github.com/JK-Rolling/DuinoI2C_ESP" target="_blank">
             <img src="https://duinocoin.com/assets/icons/duino.png" alt="Duino Coin Logo" class="logo">
             </a>
-            <h1>DuinoI2C_ESP Dashboard</h1>
+            <h1>DuinoI2C ESP Dashboard</h1>
+            </div>
+            <button id="darkModeToggle" aria-label="Toggle dark mode">
+                <span class="icon"></span>
+            </button>
         </header>
 
         <div class="info-panel">
             <div class="info-item">
-                <span class="info-label">IP Address:<span id="ip-address" class="info-value">Loading...</span></span>
-                
+                <span class="info-label">IP Address:<span id="ip-address" class="info-value">Loading..</span></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Firmware Version:<span id="firmware-version" class="info-value">Loading...</span></span>
+                <span class="info-label">Firmware Version:<span id="firmware-version" class="info-value">Loading..</span></span>
                 
             </div>
         </div>
@@ -502,13 +646,46 @@
 
         <footer>
         <div class="footer-content">
-            <p style="font-size:small"; >DuinoI2C_ESP Dashboard by <a href="https://github.com/ItachiPrime" target="_blank" rel="noopener noreferrer" class="itachi-link">Itachi</a></p> 
-            
+            <p style="font-size:15px"; >DuinoI2C_ESP Dashboard by <a href="https://github.com/ItachiPrime" target="_blank" rel="noopener noreferrer" class="itachi-link">Itachi</a></p>
         </div>
     </footer>
     </div>
 
     <script>
+
+        //Dark UI Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        const el = document.getElementById('input_el');
+        const panel = document.querySelector('.info-panel');
+        const terminal = document.getElementById('terminal');
+        const container = document.querySelector('.container');
+        const web = document.querySelector('.webserial-container');
+        const footer = document.querySelector('.footer-content');
+        
+        function toggleDarkMode() {
+        darkModeToggle.classList.toggle('dark');
+        body.classList.toggle('dark-mode');
+
+        const controlGroups = document.querySelectorAll('.control-group');
+        controlGroups.forEach(group => {
+            group.classList.toggle('dark');
+        });
+        const labelGroups = document.querySelectorAll('.control-label');
+        labelGroups.forEach(group => {
+            group.classList.toggle('dark');
+        });
+
+        web.classList.toggle('dark');
+        container.classList.toggle('dark');
+        footer.classList.toggle('dark');
+        terminal.classList.toggle('dark');
+        panel.classList.toggle('dark');
+        el.classList.toggle('dark');
+        }
+
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+
 
         // Helper function to create XMLHttpRequest
         function createXmlHttpObject() {
@@ -773,31 +950,30 @@
             }
         }
     
-            // Add event listener for toggle switch
-            ge("toggle-terminal").addEventListener("change", function () {
-                const terminal = ge("terminal");
-                const inputDiv = ge("input_div");
+        // Add event listener for toggle switch
+        ge("toggle-terminal").addEventListener("change", function () {
+            const terminal = ge("terminal");
+            const inputDiv = ge("input_div");
     
-                if (this.checked) {
-                    terminal.style.display = "block";
-                    inputDiv.style.display = "block";
-                    terminal.innerHTML="";
-                    startSocket();   // Start WebSocket connection
-                    startEvents();   // Start SSE connection
-                } else {
-                    terminal.style.display = "none";
-                    inputDiv.style.display = "none";
-                    endSocket();     // End WebSocket connection
-                    endEvents();     // End SSE connection
-                }
-            });
+            if (this.checked) {
+                terminal.style.display = "block";
+                inputDiv.style.display = "block";
+                terminal.innerHTML="";
+                startSocket();   // Start WebSocket connection
+                startEvents();   // Start SSE connection
+            } else {
+                terminal.style.display = "none";
+                inputDiv.style.display = "none";
+                endSocket();     // End WebSocket connection
+                endEvents();     // End SSE connection
+            }
+         });
     
         // Ensure both WebSocket and SSE connections are closed when the page is unloaded or refreshed
         window.onbeforeunload = function () {
             endSocket();    // Close WebSocket connection
             endEvents();    // Close SSE connection
         };
-
     </script>
 </body>
 </html>
