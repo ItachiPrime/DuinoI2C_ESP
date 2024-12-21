@@ -15,7 +15,22 @@
         * {
             box-sizing: border-box;
         }
-        
+
+        .at{
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .att{
+            color: #000000;
+            margin: 0px 2px;
+        }
+
+        .att.dark{
+            color: #FFFFFF;
+        }
+
         .head a{
             width:40px;
             height:40px;
@@ -402,7 +417,7 @@
         }
 
         #input_el {
-            width: 100%;
+            width: -webkit-fill-available;
             padding: 5px;
             background-color: #000000;
             color: white;
@@ -572,6 +587,12 @@
                 font-size: 12px;
                 padding: 6px 10px;
             }
+
+            #input_div{
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -652,6 +673,13 @@
             </pre>
             <div id="input_div">
                 <input type="text" id="input_el" placeholder="Type a command...">
+                <div class="at">
+                  <p class="att">Autoscroll</p>
+                  <label class="webserial-switch">
+                      <input type="checkbox" id="toggle-terminal2">
+                      <span class="webserial-slider round"></span>
+                  </label>
+                  </div>
             </div>
         </div>
 
@@ -667,6 +695,7 @@
         //Dark UI Toggle
         const darkModeToggle = document.getElementById('darkModeToggle');
         const body = document.body;
+        const at = document.querySelector('.att');
         const el = document.getElementById('input_el');
         const panel = document.querySelector('.info-panel');
         const terminal = document.getElementById('terminal');
@@ -693,6 +722,7 @@
         terminal.classList.toggle('dark');
         panel.classList.toggle('dark');
         el.classList.toggle('dark');
+        at.classList.toggle('dark');
         }
 
         darkModeToggle.addEventListener('click', toggleDarkMode);
@@ -849,16 +879,13 @@
 
         // Scrolling Function
         function stb() {
-        // Detect if the device is not a mobile phone
-        if (!isMobileDevice()) {
         const terminal = ge("terminal");
-        terminal.scrollTop = terminal.scrollHeight;
-        }
-        }
+        const toggle = ge("toggle-terminal2"); // Get the checkbox element
 
-        // Function to detect if the device is mobile
-        function isMobileDevice() {
-        return /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+        // Only auto-scroll if the checkbox is checked
+        if (toggle.checked) {
+            terminal.scrollTop = terminal.scrollHeight;
+        }
         }
 
         // Function to add messages to the terminal
@@ -968,7 +995,8 @@
     
             if (this.checked) {
                 terminal.style.display = "block";
-                inputDiv.style.display = "block";
+                inputDiv.style.display = "flex";
+                inputDiv.style.justifyContent = "space-between";
                 terminal.innerHTML="";
                 startSocket();   // Start WebSocket connection
                 startEvents();   // Start SSE connection
