@@ -774,7 +774,7 @@
                     document.getElementById('oled-toggle').textContent = 'OLED Screen:' + status;
                 }
             };
-            xhttp.open('PUT', 'BUTTON_0', true);
+            xhttp.open('PUT', 'oled_toggle', true);
             xhttp.send();
         });
 
@@ -787,7 +787,7 @@
                     document.getElementById('led-toggle').textContent = 'Onboard LED:' + status;
                 }
             };
-            xhttp.open('PUT', 'BUTTON_2', true);
+            xhttp.open('PUT', 'led_toggle', true);
             xhttp.send();
         });
 
@@ -828,7 +828,7 @@
         // Restart ESP
         document.getElementById('restart-esp').addEventListener('click', function() {
             var xhttp = createXmlHttpObject();
-            xhttp.open('PUT', 'BUTTON_1', true);
+            xhttp.open('PUT', 'restart', true);
             xhttp.send();
         });
 
