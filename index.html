@@ -656,6 +656,7 @@
                 <div class="control-item">
                     <button id="restart-esp" class="btn warning">Restart ESP</button>
                     <button id="update-esp" class="btn warning">Update ESP</button>
+                    <button id="reset-oled" class="btn warning">Reset OLED</button>
                 </div>
             </div>
         </div>
@@ -676,7 +677,7 @@
                 <div class="at">
                   <p class="att">Autoscroll</p>
                   <label class="webserial-switch">
-                      <input type="checkbox" id="toggle-terminal2">
+                      <input type="checkbox" id="toggle-terminal2" checked>
                       <span class="webserial-slider round"></span>
                   </label>
                   </div>
@@ -829,6 +830,13 @@
         document.getElementById('restart-esp').addEventListener('click', function() {
             var xhttp = createXmlHttpObject();
             xhttp.open('PUT', 'restart', true);
+            xhttp.send();
+        });
+        
+        // Reset OLED
+        document.getElementById('reset-oled').addEventListener('click', function() {
+            var xhttp = createXmlHttpObject();
+            xhttp.open('PUT', 'oled_reset', true);
             xhttp.send();
         });
 
