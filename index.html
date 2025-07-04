@@ -130,6 +130,25 @@
         .webserial-container.dark{
             background-color: #000000;
         }
+        
+        .safari-message {
+            display: none;
+            color: #ff0000;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .safari .safari-message {
+            display: block;
+        }
+
+        .safari .webserial-switch {
+            display: none;
+        }
 
         .header-container {
             display: flex;
@@ -660,7 +679,7 @@
                 </div>
             </div>
         </div>
-
+        
         <div class="webserial-container">
             <div class="header-container">
                 <h2 class="wb">Web Serial</h2>
@@ -669,30 +688,41 @@
                     <span class="webserial-slider round"></span>
                 </label>
             </div>
-            <pre id="terminal">
-                <!-- Terminal content will appear here -->
-            </pre>
+            <!-- Add the Safari message element -->
+            <div id="safari-message" class="safari-message">
+                Web Serial requires Chrome, Edge, or Firefox for full functionality
+            </div>
+            <pre id="terminal"><!-- Terminal content will appear here --></pre>
             <div id="input_div">
                 <input type="text" id="input_el" placeholder="Type a command...">
                 <div class="at">
-                  <p class="att">Autoscroll</p>
-                  <label class="webserial-switch">
-                      <input type="checkbox" id="toggle-terminal2" checked>
-                      <span class="webserial-slider round"></span>
-                  </label>
-                  </div>
+                    <p class="att">Autoscroll</p>
+                    <label class="webserial-switch">
+                        <input type="checkbox" id="toggle-terminal2" checked>
+                        <span class="webserial-slider round"></span>
+                    </label>
+                </div>
             </div>
         </div>
 
         <footer>
-        <div class="footer-content">
-            <p style="font-size:15px"; >DuinoI2C_ESP Dashboard by <a href="https://github.com/ItachiPrime" target="_blank" rel="noopener noreferrer" class="itachi-link">Itachi</a></p>
-        </div>
-    </footer>
+            <div class="footer-content">
+                <p style="font-size:15px">
+                    DuinoI2C_ESP by 
+                    <a href="https://github.com/JK-Rolling/DuinoI2C_ESP" target="_blank" rel="noopener noreferrer" class="itachi-link">JK Rolling</a> 
+                    and Dashboard by 
+                    <a href="https://github.com/ItachiPrime" target="_blank" rel="noopener noreferrer" class="itachi-link">Itachi</a>
+                </p>
+            </div>
+        </footer>
     </div>
 
     <script>
 
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        if (isSafari) {
+            document.body.classList.add('safari');
+        }
         //Dark UI Toggle
         const darkModeToggle = document.getElementById('darkModeToggle');
         const body = document.body;
@@ -866,7 +896,6 @@
                 }
             }, 500); // Adjust delay as needed
         });
-
         
         // Webserial fuctionality
         var lastinput = "";
@@ -913,33 +942,49 @@
     
         // WebSocket connection setup
         function startSocket() {
-            const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
-            ws = new WebSocket(`${protocol}${location.host}/ws`);
+            ws = new WebSocket('ws://' + document.location.host + '/ws', ['arduino']);
             ws.binaryType = "arraybuffer";
-        
-            ws.onopen = () => addMessage("Connected");
-            ws.onclose = () => { addMessage("Disconnected"); setTimeout(startSocket, 3000); };
-            ws.onerror = e => { console.error("ws error", e); addMessage("Error"); };
-            ws.onmessage = e => {
-              let msg = e.data instanceof ArrayBuffer
-                ? 'BIN:' + Array.from(new Uint8Array(e.data)).map(b => String.fromCharCode(b)).join('')
-                : e.data;
-              addMessage(msg);
+    
+            ws.onopen = function (e) {
+                addMessage("Connected");
             };
-        
-            ge("input_el").onkeydown = function (e) {
-              stb();
-              if (e.keyCode === 13) {
-                if (this.value !== "") {
-                  ws.send(this.value);
-                  lastinput = this.value;
-                  this.value = "";
+    
+            ws.onclose = function (e) {
+                addMessage("Disconnected");
+                setTimeout(startSocket, 3000);
+            };
+    
+            ws.onerror = function (e) {
+                console.log("ws error", e);
+                addMessage("Error");
+            };
+    
+            ws.onmessage = function (e) {
+                var msg = "";
+                if (e.data instanceof ArrayBuffer) {
+                    msg += "BIN:";
+                    var bytes = new Uint8Array(e.data);
+                    for (var i = 0; i < bytes.length; i++) {
+                        msg += String.fromCharCode(bytes[i]);
+                    }
                 } else {
-                  this.value = lastinput;
+                    msg += e.data;
                 }
-              }
+                addMessage(msg);
             };
-          }
+    
+            // Handling input from the user (terminal input)
+            ge("input_el").onkeydown = function (e) {
+                stb();
+                if (e.keyCode == 13 && ge("input_el").value != "") {
+                    ws.send(ge("input_el").value);
+                    lastinput = ge("input_el").value;
+                    ge("input_el").value = "";
+                } else if (e.keyCode == 13 && ge("input_el").value == "") {
+                    ge("input_el").value = lastinput;
+                }
+            };
+        }
     
         // End WebSocket connection
         function endSocket() {
